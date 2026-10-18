@@ -1,0 +1,12 @@
+services:
+  klop:
+    build: .
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${PORT:-8080}:8080"
+    environment:
+      APP_PATH: ${APP_PATH:-}
+    volumes:
+      - klop-data:/data
+    restart: unless-stopped
+volumes:
+  klop-data:

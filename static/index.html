@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="no-referrer">
+  <title>Клоп — общие списки</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="./"><span class="brand-mark">к.</span> клоп<span class="brand-dot">/</span></a>
+      <div class="workspace-label"><span class="status-dot"></span> ОБЩЕЕ ПРОСТРАНСТВО</div>
+      <nav aria-label="Навигация">
+        <button class="nav-item active" data-filter="all"><span data-icon="layers"></span> Все списки <span class="count" id="all-count">0</span></button>
+        <button class="nav-item" data-filter="ungrouped"><span data-icon="inbox"></span> Без группы <span class="count" id="ungrouped-count">0</span></button>
+        <div class="nav-label">ГРУППЫ <button class="icon-button" id="manage-groups" aria-label="Управлять группами" title="Управлять группами"><span data-icon="plus"></span></button></div>
+        <div id="group-nav"></div>
+        <div class="nav-divider"></div>
+        <button class="nav-item" data-filter="trash"><span data-icon="trash"></span> Корзина <span class="count" id="trash-count">0</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="file-actions"><button id="import-button"><span data-icon="upload"></span> Импорт JSON</button><button id="export-button"><span data-icon="download"></span> Экспорт всего</button></div>
+        <button class="profile" id="profile-button" title="Изменить никнейм"><span class="avatar" id="avatar">?</span><span><strong id="nickname-label">Ваш никнейм</strong><small>На этом устройстве</small></span><span data-icon="edit"></span></button>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar"><span>Место для того, что нужно сделать.</span><span class="sync" id="sync-status"><span class="status-dot"></span> Подключение…</span></header>
+      <section class="content">
+        <div class="page-heading"><div><div class="eyebrow">МЕНЬШЕ В ГОЛОВЕ. БОЛЬШЕ ПОРЯДКА.</div><h1 id="page-title">Все списки<span>.</span></h1><p id="page-description">Дела, покупки и всё остальное — в одном месте.</p></div><button class="button primary" id="new-list"><span data-icon="plus"></span> Создать список</button></div>
+        <div class="toolbar"><div id="list-summary">0 списков</div><div class="view-switch" role="group" aria-label="Вид списков"><button id="grid-view" class="selected" aria-label="Плитка" title="Плитка"><span data-icon="grid"></span></button><button id="row-view" aria-label="Список" title="Список"><span data-icon="list"></span></button></div></div>
+        <div id="lists" class="lists-grid"></div>
+        <div id="trash-items"></div>
+        <div id="empty-state" class="empty-state" hidden><span class="empty-icon" data-icon="layers"></span><h2>Здесь пока пусто</h2><p>Создайте первый список и освободите немного места в голове.</p><button class="button" id="empty-create"><span data-icon="plus"></span> Создать список</button></div>
+        <footer class="page-footer"><span>Каждое большое дело начинается с маленького списка.</span><span>клоп / просто по пунктам</span></footer>
+      </section>
+    </main>
+  </div>
+  <dialog id="nickname-dialog" class="small-dialog"><form id="nickname-form"><div class="dialog-brand">к.</div><div class="eyebrow">ОБЩЕЕ ПРОСТРАНСТВО</div><h2>Как вас называть?</h2><p class="muted">Нужен только никнейм. Запомним его на этом устройстве.</p><label>Никнейм<input id="nickname-input" maxlength="40" placeholder="Например, Саша" required autocomplete="nickname"></label><button class="button primary full" type="submit">Начать <span data-icon="arrow"></span></button></form></dialog>
+  <dialog id="create-dialog" class="small-dialog"><form id="create-form"><div class="dialog-heading"><h2>Новый список</h2><button type="button" class="icon-button" data-close="create-dialog" aria-label="Закрыть"><span data-icon="close"></span></button></div><label>Название<input name="title" maxlength="200" placeholder="Что нужно сделать?" required></label><label>Тип списка<select name="kind"><option value="simple">Простой список</option><option value="categorized">С категориями</option><option value="ordered">Упорядоченный</option></select></label><label>При выполнении пункта<select name="completion"><option value="strike">Зачеркнуть</option><option value="trash">Перенести в корзину</option><option value="delete">Удалить навсегда</option></select></label><p class="hint">Список появится без группы. Группы можно назначить в настройках списка.</p><button class="button primary full" type="submit">Создать список</button></form></dialog>
+  <dialog id="editor-dialog" class="editor-dialog"><div id="editor"></div></dialog>
+  <dialog id="groups-dialog" class="small-dialog"><div class="dialog-heading"><h2>Группы</h2><button class="icon-button" data-close="groups-dialog" aria-label="Закрыть"><span data-icon="close"></span></button></div><p class="muted">Один список может быть в нескольких группах.</p><form id="group-form" class="inline-form"><input name="name" required maxlength="60" placeholder="Название группы" aria-label="Название группы"><button class="button primary" type="submit" aria-label="Добавить группу"><span data-icon="plus"></span></button></form><div id="groups-manager"></div></dialog>
+  <dialog id="settings-dialog" class="small-dialog"><form id="settings-form"><div class="dialog-heading"><h2>Настройки списка</h2><button type="button" class="icon-button" data-close="settings-dialog" aria-label="Закрыть"><span data-icon="close"></span></button></div><label>Название<input name="title" required maxlength="200"></label><label>Тип списка<select name="kind"><option value="simple">Простой список</option><option value="categorized">С категориями</option><option value="ordered">Упорядоченный</option></select></label><label>При выполнении пункта<select name="completion"><option value="strike">Зачеркнуть</option><option value="trash">Перенести в корзину</option><option value="delete">Удалить навсегда</option></select></label><fieldset><legend>Группы</legend><div id="settings-groups"></div></fieldset><button type="submit" class="button primary full">Сохранить</button></form></dialog>
+  <dialog id="confirm-dialog" class="small-dialog"><h2 id="confirm-title"></h2><p class="muted" id="confirm-description"></p><div class="confirm-actions"><button class="button" id="confirm-cancel">Отмена</button><button class="button danger" id="confirm-ok">Удалить</button></div></dialog>
+  <input type="file" id="import-file" accept="application/json,.json" hidden>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
