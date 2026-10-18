@@ -71,10 +71,21 @@ class SharedListsTest(unittest.TestCase):
         return next(l for l in result['state']['lists'] if l['id'] == value['id'])
 
     def test_hidden_path_covers_assets_and_api(self):
-        for path in ('/', '/api/state', '/api/action', '/app.js', '/static/index.html', '/test-hidden-path-123456/../server.py'):
+        for path in ('/', '/api/state', '/api/action', '/api/health', '/app.js', '/static/index.html', '/test-hidden-path-123456/../server.py'):
             self.assertEqual(self.request(path, root=True)[0], 404)
         self.assertEqual(self.request('/')[0], 200)
         self.assertEqual(self.request('/app.js')[0], 200)
+
+    def test_container_readiness(self):
+        self.assertEqual(self.request('/api/health'), (200, {'healthy': True}))
+        check = subprocess.run([sys.executable, 'healthcheck.py'], cwd=ROOT, env=self.env,
+                               capture_output=True, timeout=5)
+        self.assertEqual(check.returncode, 0, check.stderr)
+        check = subprocess.run([sys.executable, 'healthcheck.py'], cwd=ROOT,
+                               env={**self.env, 'APP_PATH':'wrong-secret-path-123456'},
+                               capture_output=True, timeout=5)
+        self.assertEqual(check.returncode, 1)
+        self.assertEqual(check.stdout + check.stderr, b'')
 
     def test_generated_access_path_survives_restart(self):
         with tempfile.TemporaryDirectory() as directory:

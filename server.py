@@ -256,6 +256,13 @@ class Handler(BaseHTTPRequestHandler):
         if path in assets:
             file, mime = assets[path]
             self.send(200, (ROOT / 'static' / file).read_bytes(), mime)
+        elif path == BASE + '/api/health':
+            try:
+                with connect() as db:
+                    db.execute('SELECT id FROM lists LIMIT 1').fetchone()
+                self.send(200, {'healthy': True})
+            except sqlite3.Error:
+                self.send(503, {'healthy': False})
         elif path == BASE + '/api/state':
             with connect() as db:
                 self.send(200, state(db))
